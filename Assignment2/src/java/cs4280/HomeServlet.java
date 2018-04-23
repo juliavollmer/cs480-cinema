@@ -50,6 +50,10 @@ public class HomeServlet extends HttpServlet {
             }
             else if (action.equalsIgnoreCase("authorize")) {
                 this.doAuthorizeRequest(request, response);
+            }else if(action.equalsIgnoreCase("manageSeat")){
+                 this.doManageSeats(request, response);
+            }else if(action.equalsIgnoreCase("scheduleMovie")){
+                 this.doScheduleMovie(request, response);
             }
            
         }
@@ -348,8 +352,45 @@ public class HomeServlet extends HttpServlet {
       
     }
 
-    private void showManagerHome(HttpServletRequest request, HttpServletResponse response) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void showManagerHome(HttpServletRequest request, HttpServletResponse response) throws IOException, NullPointerException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        
+        try {
+            HttpSession session = request.getSession();
+            User userBean = (User) session.getAttribute("user");
+            
+            //session.invalidate();
+            out.println("<html>");
+            out.println("<head>");
+            out.println(" <title>Home Page</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Home Page</h1>");
+            out.println("<fieldset>");
+            out.println("<p>Welcome! Dear "
+                    +userBean.getName() +"</p>");
+            
+            
+            
+            //print all purchase record
+                out.println("<fieldset>");
+                out.println("<legend>Manipulation</legend>");
+                out.println("<a href='" + request.getRequestURI() + "?action=manageSeats'>Mange Seats</a>");
+                out.println("<br><a href='" + request.getRequestURI() + "?action=scheduleMovie'>Manage Movie Schedule</a>");
+                out.println("</fieldset>");
+                
+                  //get the current time
+//                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//                Date date = new Date();
+//                String d = dateFormat.format(date);
+            out.println("</fieldset>");
+
+        } finally { 
+            
+            out.close();
+        }
     }
 
     private void showOfficerHome(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -551,6 +592,219 @@ public class HomeServlet extends HttpServlet {
                 
                 
                
+                
+            }
+            out.println("<br/><a href='" + request.getRequestURI() + "'>Back to Home Page</a>");
+            out.println("</fieldset>");
+            out.println("</div>");
+            out.println("</body>");
+            out.println("</html>");
+            
+        }catch(ClassNotFoundException e){
+            out.println("<div style='color: red'>" + e.toString() + "</div>");
+        }catch(SQLException e){
+            out.println("<div style='color: red'>" + e.toString() + "</div>");
+        }finally{
+            out.close();
+        }
+    }
+
+    private void doManageSeats(HttpServletRequest request, HttpServletResponse response) throws IOException {
+       response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        
+        try{
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Phonebook</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Phonebook (Delete)</h1>");
+            out.println("<div style='width:600px'>");
+            
+            out.println("<fieldset>");
+            String page = request.getParameter("page");
+            String pid = request.getParameter("pid");
+            
+            
+            if (page != null && !page.equalsIgnoreCase("") ) {
+
+                // Register the JDBC driver, open a connection
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = DriverManager.getConnection("jdbc:sqlserver://w2ksa.cs.cityu.edu.hk:1433;databaseName=aiad039_db",
+                            "aiad039", "aiad039");
+
+                // Create a preparedstatement to set the SQL statement			 
+                PreparedStatement pstmt = con.prepareStatement("INSERT INTO [request] ([PID], [Status]) VALUES (?, 'Waiting')");
+                pstmt.setInt(1, Integer.parseInt(pid));
+                
+                // execute the SQL statement
+                int rows = pstmt.executeUpdate();
+
+                if (rows>0) {
+                    out.println("<legend>The record is successfuly created.</legend>");
+                    // display the information of the record just added including UID
+                     Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+                    // execute the SQL statement
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM [request] WHERE [pid] ="+pid);
+                   
+                    if (rs != null && rs.next() != false) {
+                            out.println("<p>UID: " + rs.getInt(1) + "</p>");
+                            rs.close();
+                    }
+                    if (stmt != null) {
+                            stmt.close();
+                    }
+                    out.println("<h3>We have accept your request!</h3>");
+                    
+                }
+                else {
+                    out.println("<legend>ERROR: New record is failed to create.</legend>");
+                }
+               
+                
+            }else {
+                
+                 // Register the JDBC driver, open a connection
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = DriverManager.getConnection("jdbc:sqlserver://w2ksa.cs.cityu.edu.hk:1433;databaseName=aiad039_db",
+                            "aiad039", "aiad039");
+                Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+               
+                // execute the SQL statement
+                ResultSet rs = stmt.executeQuery("SELECT * FROM [request] WHERE [pid] ="+pid);
+                int numRow = 0;
+                if (rs != null && rs.last() != false) {
+                    numRow = rs.getRow();
+                    rs.beforeFirst();
+                }
+               
+                if(numRow == 0){//if the record hasn't been refunded
+
+                    rs = stmt.executeQuery("SELECT * FROM [purchase] WHERE [pid] ="+pid);
+                    String method = "";
+                    if (rs != null && rs.next() != false) {
+                        method = rs.getString("PayMethod");
+         
+                            
+                    }
+                    if(method.equals("point")){
+                        out.println("<h3>Sorry, You cannot refund purchase with points.</h3>");
+                    }else{
+                        out.println("<h3>Do you want to refund this purchase?</h3>");
+                        while(rs !=null &&rs.next()!=false){
+                           out.println("<form method='POST' action='" + request.getRequestURI() + "'>");
+                           out.println("<input name='action' type='hidden' value='refund' />");
+                           out.println("<input name='pid' type='hidden' value='"
+                                   + pid+"' />");
+                           out.println("<input name='page' type='hidden' value='1' />");
+                           int sid = rs.getInt("sid");
+                           String date = rs.getString("time");
+                           out.println("<tr>");
+                           out.println("<td>" + pid + "</td>");
+                           out.println("<td>" + sid + "</td>");
+                           out.println("<td>" + date + "</td>");
+                           out.println("</tr>");
+                           out.println("<br><input type='submit' value='Refund!' />");
+                           out.println("</form>");
+                       }
+                    }
+                    
+                    
+                }else{//if the record has already been refunded, show status
+                 
+                    while(rs !=null &&rs.next()!=false){
+                    
+                    int arid = rs.getInt("rid");
+                    int executor = rs.getInt("UID");
+                    out.println("<P>We have accept your request for refund"
+                            + arid+ " on refund has already been approved by "
+                            + executor +" </P>");
+                }
+                }
+               
+                
+            }
+            out.println("<br/><a href='" + request.getRequestURI() + "'>Back to Home Page</a>");
+            out.println("</fieldset>");
+            out.println("</div>");
+            out.println("</body>");
+            out.println("</html>");
+            
+        }catch(ClassNotFoundException e){
+            out.println("<div style='color: red'>" + e.toString() + "</div>");
+        }catch(SQLException e){
+            out.println("<div style='color: red'>" + e.toString() + "</div>");
+        }finally{
+            out.close();
+        }
+    }
+
+    private void doScheduleMovie(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try{
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Manage Movie Schedule</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Manage Movie Schedule</h1>");
+            out.println("<div style='width:600px'>");
+            
+            out.println("<fieldset>");
+            
+            
+            String page = request.getParameter("page");
+            String pid = request.getParameter("pid");
+            
+            
+            if (page != null && !page.equalsIgnoreCase("") ) {
+
+            }else {
+                // make connection to db and retrieve data from the table			
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection con = DriverManager.getConnection("jdbc:sqlserver://w2ksa.cs.cityu.edu.hk:1433;databaseName=aiad039_db",
+                                "aiad039", "aiad039");
+                Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                
+                ResultSet rs = stmt.executeQuery("SELECT * FROM [movie]");
+            
+                int numRow = 0;
+                if (rs != null && rs.last() != false) {
+                    numRow = rs.getRow();
+                    rs.beforeFirst();
+                }
+                
+                out.println("<p>Select movie<br/><select name='movie' style='width:100%;'>");
+                if(numRow == 0){//if there is no record
+                    out.println("<option><no movie></option>");
+                }else{//
+                    
+                    while (rs != null && rs.next() != false) {
+                        int mid = rs.getInt("mid");
+                        String name = rs.getString("Name");
+                        out.println("<option value = "
+                                + mid+">"
+                                + name+"</option>");
+                    }
+                }
+                out.println("</select></p>");
+                out.println("<p>Select venue<br/><select name='venue' style='width:100%;'>");
+                out.println("<option>Hall A</option>");
+                out.println("<option>Hall B</option>");
+                out.println("</select></p>");
+                
+                out.println("<p>Select show time<br/><select name='time' style='width:100%;'>");
+                out.println("<option>14:00~16:00</option>");
+                out.println("<option>20:00~22:00</option>");
+                out.println("</select></p>");
+                
+                out.println("<p>Please enter price: <input type='text' name='price' /></p>");
+               
+                out.println("<p><input type='submit' value='Create Schedule' /></p>");
+
                 
             }
             out.println("<br/><a href='" + request.getRequestURI() + "'>Back to Home Page</a>");
