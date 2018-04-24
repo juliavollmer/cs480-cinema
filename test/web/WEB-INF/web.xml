@@ -4,17 +4,9 @@
         <servlet-name>JDBCServlet</servlet-name>
         <servlet-class>cs4280.Controller</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>MovieLookup</servlet-name>
-        <servlet-class>cs4280.MovieLookup</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>JDBCServlet</servlet-name>
         <url-pattern>/index.do</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>MovieLookup</servlet-name>
-        <url-pattern>/MovieLookup</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

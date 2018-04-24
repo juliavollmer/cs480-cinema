@@ -5,14 +5,16 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
+import java.util.*;
 
-/* emulate database lookup */
+/**
+ *
+ * @author jsvollmer2
+ */
 public class MovieLookup {
- private static java.util.Map<String, cs4280.MovieDetail> movies;
-
-  /* Makes a small table of banking customers. */
-  static {
+ private static Map<String, cs4280.MovieDetail> movies;
+public static int length;
+ public static void MoviesCreate(){
     movies = new java.util.HashMap();
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -32,6 +34,7 @@ public class MovieLookup {
         } catch (ClassNotFoundException e) {
         } catch (SQLException e) {
         }
+        length = movies.size();
   }
 
   /** Finds the customer with the given ID.

@@ -24,13 +24,17 @@
                      type="cs4280.MovieDetail" 
                      scope="request" />
         <title><jsp:getProperty name="movie" property="name" />: Seating Plan</title>
+        <jsp:include page="../include/statement.jsp" />
     </head>
     <body>
         <h1><jsp:getProperty name="movie" property="name" />: Seating Plan</h1><br>
         <h3>Date: <jsp:getProperty name="schedule" property="date" /> Time: 
             <jsp:getProperty name="schedule" property="time" /> Price:
             <jsp:getProperty name="schedule" property="price" /> </h3>
-        <FORM ACTION="buy">
+        <form>
+            <input name='action' type='hidden' value='buying' />
+
+            <input name='sid' type='hidden' value='<jsp:getProperty name="schedule" property="sid" />' />
             <div><table style='width:100%'>
                     <thead>
                     <th align='left'> Row</th> <th></th><th align='center'> Screen</th>
@@ -53,7 +57,7 @@
                         <tr>
                             <td><%= row%></td><% } %>
 
-                            <td><input type='checkbox' name='seat' value='<jsp:getProperty name="seat" property="value" />'><jsp:getProperty name="seat" property="seid" /></td>
+                            <td><input type='checkbox' name='seat' value='<jsp:getProperty name="seat" property="seid" />' <jsp:getProperty name="seat" property="value" />><jsp:getProperty name="seat" property="seid" /></td>
 
 
                             <% }%>
@@ -62,7 +66,8 @@
 
             <br>
             <INPUT TYPE="SUBMIT" VALUE="Submit Order">
-        </FORM><br/>
-    </div>
+        </form><br/>
+    </div> <br>
+    <jsp:include page="../include/statement.jsp" />
 </body>
 </html>

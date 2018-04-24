@@ -5,10 +5,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-
+import java.util.*;
+/**
+ *
+ * @author jsvollmer2
+ */
 public class ScheduleLookup {
- private static java.util.Map<String, cs4280.Schedule> schedule;
+ private static Map<String, cs4280.Schedule> schedule;
 
   public static void ScheduleCreate(){
     schedule = new HashMap();

@@ -1,3 +1,8 @@
+<%-- 
+    Document   : showMovie
+    Created on : Apr 15, 2018, 4:17:53 PM
+    Author     : jsvollmer2
+--%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <HTML>
@@ -7,6 +12,7 @@
              scope="request" />
 
 <TITLE><jsp:getProperty name="movie" property="name" /></TITLE>
+        <jsp:include page="../include/statement.jsp" />
 <!--<LINK REL=STYLESHEET
       HREF="app-styles.css"
       TYPE="text/css">-->
@@ -15,7 +21,7 @@
 <BODY>
 <TABLE BORDER=5 ALIGN="CENTER">
   <TR><TH CLASS="TITLE">
-  <jsp:getProperty name="movie" property="mid" /></TABLE>
+  <jsp:getProperty name="movie" property="name" /></TABLE>
 <P>
 <IMG SRC="<jsp:getProperty name='movie' property='cover' />"
      ALIGN="RIGHT">
@@ -40,9 +46,7 @@
 <jsp:getProperty name="movie" property="cast" />
 <%@ include file="/WEB-INF/showSchedule.jsp" %> 
 
-
-<%-- Note the lack of "boats" at the front of URI below --%>
-<%-- @ taglib uri="/WEB-INF/tlds/count-taglib.tld" prefix="boats" --%>
-<%-- boats:count / --%>
+ <br>
+        <jsp:include page="../include/statement.jsp" />
 </BODY>
 </HTML>

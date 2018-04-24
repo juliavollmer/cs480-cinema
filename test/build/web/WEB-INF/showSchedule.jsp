@@ -26,5 +26,6 @@
  
 %></select>
 <br><br>
-  <INPUT TYPE="SUBMIT" VALUE="Submit Order">
+  <INPUT TYPE="SUBMIT" VALUE="Proceed to Payment">
+  
 </FORM>

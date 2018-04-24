@@ -124,17 +124,32 @@ public class Controller extends HttpServlet {
 
         String seats[] = request.getParameterValues("seat");
         String sid = request.getParameter("sid");
+        Float total = Float.parseFloat(request.getParameter("total"));
+        String paymethod = request.getParameter("paymethod");
+        String seat = "";
+        // I haven't implemented any user yet
+        String time ="2018";
+        int uid = 3; 
+        String actor = "Customer";
+        int points = 2;
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection("jdbc:sqlserver://w2ksa.cs.cityu.edu.hk:1433;databaseName=aiad039_db", "aiad039", "aiad039");
             for (int i=0;i<seats.length;i++) {
                 String update = "UPDATE [schedule] SET [Seats] = [Seats] + ' " + seats[i] + "' WHERE [SID] = " + sid + "";
+                seat = seat +" "+ seats[i];
                 Statement stmt = con.createStatement();
                 stmt.executeUpdate(update);
                 stmt.close();
 
                 
-            }con.close();
+            }
+            String query = "INSERT INTO [purchase] ([SID], [UID], [Status], [Seat], [Time], [Price], [GainedPoints], [PayMethod], [Actor]) "
+                    + "VALUES("+ Integer.parseInt(sid) + "," + uid +" 'Completed', " + seat + ", " + time + ", "+ total + ", "+ points + ", " + paymethod + ", "+ actor + ")";
+            Statement stmt2 = con.createStatement();
+                stmt2.executeUpdate(query);
+                stmt2.close();
+            con.close();
         } catch (ClassNotFoundException e) {
         } catch (SQLException e) {
         }

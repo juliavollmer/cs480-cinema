@@ -1,12 +1,9 @@
 package cs4280;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-
+/**
+ *
+ * @author jsvollmer2
+ */
 public class Schedule {
 
     private String sid, mid, date, time, venue, seats, price;

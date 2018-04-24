@@ -1,13 +1,10 @@
+
 package cs4280;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.*;
-import java.util.HashMap;
-
+/**
+ *
+ * @author jsvollmer2
+ */
 public class MovieDetail {
 
     private String mid = "Missing item number";
