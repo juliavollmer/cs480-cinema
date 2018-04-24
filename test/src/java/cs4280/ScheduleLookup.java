@@ -7,12 +7,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
-/* emulate database lookup */
 public class ScheduleLookup {
  private static java.util.Map<String, cs4280.Schedule> schedule;
 
-  /* Makes a small table of banking customers. */
-  static {
+  public static void ScheduleCreate(){
     schedule = new HashMap();
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -29,15 +27,11 @@ public class ScheduleLookup {
             if (rs != null) {
                 rs.close();
             }
+            con.close();
         } catch (ClassNotFoundException e) {
         } catch (SQLException e) {
         }
   }
-
-  /** Finds the customer with the given ID.
-   *  Returns null if there is no match.
-   */
-
   public static Schedule getSchedule(java.lang.String sid) {
     return((cs4280.Schedule)schedule.get(sid));
   }

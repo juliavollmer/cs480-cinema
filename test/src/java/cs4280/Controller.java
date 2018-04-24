@@ -21,15 +21,15 @@ public class Controller extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
-
+        
         if (action != null) {
             // call different action depends on the action parameter
             if (action.equalsIgnoreCase("details")) {
                 this.doShowDetails(request, response);
             } else if (action.equalsIgnoreCase("seating")) {
                 this.doShowSeat(request, response);
-            } else if (action.equalsIgnoreCase("delete")) {
-                this.doDeleteEntry(request, response);
+            } else if (action.equalsIgnoreCase("buying")) {
+                this.doBuy(request, response);
             }
         }
 
@@ -112,17 +112,20 @@ public class Controller extends HttpServlet {
             throws ServletException, IOException {
         String address = "/WEB-INF/SeatingPlan.jsp";
         String sid = request.getParameter("sid");
+        ScheduleLookup.ScheduleCreate();
         Schedule schedule = ScheduleLookup.getSchedule(sid);
         String check = schedule.getSeats();
+
         String[] taken = {""};
-        if (check != null){
-        taken = schedule.getSeats().split(",");}
+        if (check != null) {
+            taken = schedule.getSeats().split(" ");
+        }
         List<Seat> seats = new ArrayList();
         for (int i = 1; i <= 16; i++) {
             String seatid = Integer.toString(i);
-            String value = "free";
+            String value = "abled";
             if (Arrays.asList(taken).contains(seatid)) {
-                value = "taken";
+                value = "disabled";
             }
             Seat seat = new Seat(seatid, value);
             seats.add(seat);
@@ -219,6 +222,7 @@ public class Controller extends HttpServlet {
             ResultSet rs = stmt.executeQuery("SELECT * FROM [schedule] WHERE [MID] ='" + mid + "'");
             while (rs != null && rs.next() != false) {
                 String sid = Integer.toString(rs.getInt("SID"));
+                 ScheduleLookup.ScheduleCreate();
                 Schedule schedule = ScheduleLookup.getSchedule(sid);
                 times.add(schedule);
             }
@@ -226,6 +230,7 @@ public class Controller extends HttpServlet {
             if (rs != null) {
                 rs.close();
             }
+            con.close();
         } catch (ClassNotFoundException e) {
         } catch (SQLException e) {
         }
@@ -234,8 +239,25 @@ public class Controller extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
-    private void doDeleteEntry(HttpServletRequest request, HttpServletResponse response)
+    private void doBuy(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String seat[] = request.getParameterValues("seat");
+        String sid = request.getParameter("sid");
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection con = DriverManager.getConnection("jdbc:sqlserver://w2ksa.cs.cityu.edu.hk:1433;databaseName=aiad039_db", "aiad039", "aiad039");
+            for (String seat1 : seat) {
+                String update = "UPDATE [schedule] SET [Seats] = [Seats] + ' " + seat1 + "' WHERE [SID] = " + sid + "";
+                Statement stmt = con.createStatement();
+                stmt.executeUpdate(update);
+                stmt.close();
+                
+                con.close();
+            }
+        } catch (ClassNotFoundException e) {
+        } catch (SQLException e) {
+        }
+
     }
 
     private String htmlEncode(String s) {

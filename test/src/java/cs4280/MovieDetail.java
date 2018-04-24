@@ -119,29 +119,4 @@ public class MovieDetail {
     private void setRelease(String release) {
         this.release = release;
     }
-
-   private static HashMap movies;
-   static {
-        movies = new HashMap();
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            Connection con = DriverManager.getConnection("jdbc:sqlserver://w2ksa.cs.cityu.edu.hk:1433;databaseName=aiad039_db", "aiad039", "aiad039");
-            Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            ResultSet rs = stmt.executeQuery("SELECT * FROM [movie] ORDER BY [Release] ASC");
-            while (rs != null && rs.next() != false) {
-                String mid = Integer.toString(rs.getInt("MID"));
-                movies.put(mid, new MovieDetail(mid, rs.getString("Name"), rs.getString("Intro"), rs.getString("Genre"), rs.getString("Runtime"),
-                        rs.getString("Category"), rs.getString("Language"), rs.getString("Director"), rs.getString("Cast"),
-                        rs.getString("Cover"), rs.getString("Release")));
-            }
-
-            if (rs != null) {
-                rs.close();
-            }
-        } catch (ClassNotFoundException e) {
-        } catch (SQLException e) {
-        }
-    } 
-    public static MovieDetail getMovie(String mid) {
-    return((MovieDetail)movies.get(mid));}
 }
