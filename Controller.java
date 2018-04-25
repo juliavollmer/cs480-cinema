@@ -60,6 +60,7 @@ public class Controller extends HttpServlet {
 
     private void doShowSeat(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String address = "/WEB-INF/SeatingPlan.jsp";
         String sid = request.getParameter("sid");
         ScheduleLookup.ScheduleCreate();
@@ -178,18 +179,23 @@ public class Controller extends HttpServlet {
 
     private void doShowTicketsale(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String address = "/WEB-INF/showTicketsale.jsp";
+        String address;
         String seat[] = request.getParameterValues("seat");
+        if (seat != null) {
 
-        String sid = request.getParameter("sid");
-        ScheduleLookup.ScheduleCreate();
-        Schedule schedule = ScheduleLookup.getSchedule(sid);
+            address = "/WEB-INF/showTicketsale.jsp";
 
-        MovieLookup.MoviesCreate();
-        MovieDetail movie = MovieLookup.getMovie(schedule.getMid());
-        request.setAttribute("movie", movie);
-        request.setAttribute("schedule", schedule);
-        request.setAttribute("seat", seat);
+            String sid = request.getParameter("sid");
+            ScheduleLookup.ScheduleCreate();
+            Schedule schedule = ScheduleLookup.getSchedule(sid);
+
+            MovieLookup.MoviesCreate();
+            MovieDetail movie = MovieLookup.getMovie(schedule.getMid());
+            request.setAttribute("movie", movie);
+            request.setAttribute("schedule", schedule);
+            request.setAttribute("seat", seat);
+        } else {address = "/WEB-INF/purfail.jsp";
+        }
         RequestDispatcher dispatcher = request.getRequestDispatcher(address);
         dispatcher.forward(request, response);
     }
